@@ -9,7 +9,7 @@ const NavBar = () => {
       left={0}
       right={0}
       zIndex={100}
-      bg={"rgba(255, 255, 255, 0.8)"}
+      bg={"rgba(255, 255, 255, 0.5)"}
       color="black"
       textAlign="center"
     >
