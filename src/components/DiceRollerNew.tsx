@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Box } from "@chakra-ui/react";
 
@@ -9,6 +9,19 @@ const DiceRollerNew = () => {
   const [bgColor, setBgColor] = useState("#333333");
 
   const dice = [4, 6, 8, 10, 12, 20];
+
+  useEffect(() => {
+    const savedColor = localStorage.getItem("bgColor");
+    if (savedColor) {
+      setBgColor(savedColor);
+    }
+  }, []);
+
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value;
+    setBgColor(newColor);
+    localStorage.setItem("bgColor", newColor);
+  };
 
   const handleRoll = useCallback(() => {
     const rollTotal = Math.floor(Math.random() * diceNumber) + 1 + modifier;
@@ -80,7 +93,7 @@ const DiceRollerNew = () => {
           type="color"
           name="base"
           value={bgColor}
-          onChange={(e) => setBgColor(e.target.value)}
+          onChange={handleColorChange}
           className="form-control form-control-color"
         />
       </Box>
