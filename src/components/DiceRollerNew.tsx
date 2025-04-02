@@ -1,31 +1,16 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Box, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Heading, Stack } from "@chakra-ui/react";
 import { useColorMode } from "./ui/color-mode";
-import { motion } from "framer-motion";
 
 const DiceRollerNew = () => {
   const [diceNumber, setDiceNumber] = useState(20);
   const [modifier, setModifier] = useState(0);
   const [rollTotal, setRollTotal] = useState<number | null>(null);
-  const [bgColor, setBgColor] = useState("#006400"); // Darker green default
   const [hasRolled, setHasRolled] = useState(false);
   const { colorMode } = useColorMode();
 
   const dice = [4, 6, 8, 10, 12, 20];
-
-  useEffect(() => {
-    const savedColor = localStorage.getItem("bgColor");
-    if (savedColor) {
-      setBgColor(savedColor);
-    }
-  }, []);
-
-  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = e.target.value;
-    setBgColor(newColor);
-    localStorage.setItem("bgColor", newColor);
-  };
 
   const handleRoll = useCallback(() => {
     const rollTotal = Math.floor(Math.random() * diceNumber) + 1 + modifier;
@@ -33,10 +18,8 @@ const DiceRollerNew = () => {
     setHasRolled(true);
   }, [diceNumber, modifier]);
 
-  const MotionBox = motion(Box);
-
   return (
-    <div className="p-4 min-vh-100" style={{ backgroundColor: bgColor }}>
+    <div className="p-4 min-vh-100">
       <Stack direction="column" pt={24} gap={8} alignItems="center">
         {/* Dice Selection */}
         <Box
@@ -144,9 +127,7 @@ const DiceRollerNew = () => {
 
         {/* Roll Button and Result */}
         <Stack direction="column" gap={6} alignItems="center">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <button
             className={`btn btn-${
               colorMode === "light" ? "dark" : "light"
             } btn-lg px-5 py-3`}
@@ -154,18 +135,24 @@ const DiceRollerNew = () => {
             style={{
               boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
               fontSize: "1.5rem",
+              transition: "transform 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.05)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
             }}
           >
             Roll
-          </motion.button>
+          </button>
 
-          <MotionBox
-            initial={false}
-            animate={{
-              scale: hasRolled ? 1 : 0.5,
+          <Box
+            style={{
               opacity: hasRolled ? 1 : 0,
+              transform: `scale(${hasRolled ? 1 : 0.5})`,
+              transition: "opacity 0.3s ease, transform 0.3s ease",
             }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
           >
             <Heading
               size="2xl"
@@ -175,38 +162,8 @@ const DiceRollerNew = () => {
             >
               {rollTotal !== null ? rollTotal : "-"}
             </Heading>
-          </MotionBox>
+          </Box>
         </Stack>
-
-        {/* Background Color */}
-        <Box
-          bg={
-            colorMode === "light"
-              ? "rgba(255, 255, 255, 0.1)"
-              : "rgba(0, 0, 0, 0.2)"
-          }
-          p={6}
-          borderRadius="xl"
-          backdropFilter="blur(10px)"
-          boxShadow="lg"
-          width="100%"
-          maxW="600px"
-        >
-          <Stack direction="column" gap={4} alignItems="center">
-            <Text
-              className={`text-${colorMode === "light" ? "dark" : "light"}`}
-            >
-              Background Color
-            </Text>
-            <input
-              type="color"
-              value={bgColor}
-              onChange={handleColorChange}
-              className="form-control form-control-color"
-              style={{ width: "100px", height: "50px" }}
-            />
-          </Stack>
-        </Box>
       </Stack>
     </div>
   );
