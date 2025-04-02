@@ -1,8 +1,12 @@
 import { useState, useCallback, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Box, Heading, Stack } from "@chakra-ui/react";
+import { Stack } from "@chakra-ui/react";
 import { useColorMode } from "./ui/color-mode";
 import AdvantageDisadvantage, { RollType } from "./AdvantageDisadvantage";
+import DiceSelectionComponent from "./DiceSelection";
+import ModifierInput from "./ModifierInput";
+import RollResults from "./RollResults";
+import "../styles/dice-roller.css";
 
 interface DiceSelection {
   die: number;
@@ -40,8 +44,6 @@ const DiceRollerNew = () => {
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
-
-  const dice = [4, 6, 8, 10, 12, 20];
 
   const handleDiceClick = (die: number) => {
     setSelectedDice((prev) => {
@@ -165,6 +167,20 @@ const DiceRollerNew = () => {
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
           }
+          /* Number input styling */
+          input[type="number"] {
+            -moz-appearance: textfield;
+            text-align: center !important;
+          }
+          input[type="number"]::-webkit-inner-spin-button,
+          input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+          }
+          input[type="number"]:focus {
+            outline: none;
+            box-shadow: none;
+          }
           .particle {
             position: absolute;
             pointer-events: none;
@@ -271,291 +287,19 @@ const DiceRollerNew = () => {
         alignItems="center"
         style={{ position: "relative", zIndex: 1 }}
       >
-        {/* Dice Selection */}
-        <Box
-          bg={
-            colorMode === "light"
-              ? "rgba(255, 255, 255, 0.2)"
-              : "rgba(0, 0, 0, 0.3)"
-          }
-          p={3}
-          borderRadius="3xl"
-          backdropFilter="blur(10px)"
-          boxShadow={`0 8px 32px ${
-            colorMode === "light" ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.4)"
-          }`}
-          width="100%"
-          maxW="600px"
-          style={{
-            transform: "translateZ(0)",
-            border: `2px solid ${
-              colorMode === "light"
-                ? "rgba(255,255,255,0.3)"
-                : "rgba(255,255,255,0.1)"
-            }`,
-          }}
-        >
-          <Stack direction="column" gap={2}>
-            <Heading
-              size="md"
-              className={`text-${
-                colorMode === "light" ? "dark" : "light"
-              } text-center`}
-              style={{
-                textShadow: `0 2px 4px ${
-                  colorMode === "light" ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.4)"
-                }`,
-              }}
-            >
-              Choose Your Dice
-            </Heading>
-            <Stack
-              direction="row"
-              gap={2}
-              flexWrap="wrap"
-              justifyContent="center"
-            >
-              {dice.map((die, index) => {
-                const selected = selectedDice.find((d) => d.die === die);
-                return (
-                  <div key={index} style={{ position: "relative" }}>
-                    <button
-                      className={`dice-btn btn btn-outline-${
-                        colorMode === "light" ? "dark" : "light"
-                      } rounded-circle`}
-                      onClick={() => handleDiceClick(die)}
-                      style={{
-                        width: "80px",
-                        height: "80px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "1.5rem",
-                        fontWeight: "bold",
-                        background: selected
-                          ? colorMode === "light"
-                            ? "rgba(0, 0, 0, 0.2)"
-                            : "rgba(255, 255, 255, 0.2)"
-                          : "transparent",
-                        border: `3px solid ${
-                          colorMode === "light"
-                            ? "rgba(0,0,0,0.3)"
-                            : "rgba(255,255,255,0.3)"
-                        }`,
-                        transform: selected ? "scale(1.1)" : "scale(1)",
-                      }}
-                    >
-                      <span>D{die}</span>
-                      {selected && (
-                        <span
-                          style={{
-                            fontSize: "1rem",
-                            marginTop: "-5px",
-                            opacity: 0.8,
-                          }}
-                        >
-                          ×{selected.quantity}
-                        </span>
-                      )}
-                    </button>
-                    {selected && (
-                      <button
-                        className="btn position-absolute remove-btn"
-                        style={{
-                          top: "-12px",
-                          right: "-12px",
-                          width: "28px",
-                          height: "28px",
-                          padding: 0,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          borderRadius: "50%",
-                          fontSize: "1rem",
-                          background:
-                            colorMode === "light"
-                              ? "rgba(0, 0, 0, 0.6)"
-                              : "rgba(255, 255, 255, 0.6)",
-                          color: colorMode === "light" ? "#fff" : "#000",
-                          border: `2px solid ${
-                            colorMode === "light"
-                              ? "rgba(0,0,0,0.3)"
-                              : "rgba(255,255,255,0.3)"
-                          }`,
-                          backdropFilter: "blur(5px)",
-                          transition: "all 0.2s ease",
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDiceRemove(die);
-                        }}
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </Stack>
-          </Stack>
-        </Box>
+        <DiceSelectionComponent
+          selectedDice={selectedDice}
+          onDiceClick={handleDiceClick}
+          onDiceRemove={handleDiceRemove}
+        />
 
-        {/* Advantage/Disadvantage Component */}
-        <Box
-          bg={
-            colorMode === "light"
-              ? "rgba(255, 255, 255, 0.2)"
-              : "rgba(0, 0, 0, 0.3)"
-          }
-          p={3}
-          borderRadius="3xl"
-          backdropFilter="blur(10px)"
-          boxShadow={`0 8px 32px ${
-            colorMode === "light" ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.4)"
-          }`}
-          width="100%"
-          maxW="600px"
-          style={{
-            transform: "translateZ(0)",
-            border: `2px solid ${
-              colorMode === "light"
-                ? "rgba(255,255,255,0.3)"
-                : "rgba(255,255,255,0.1)"
-            }`,
-          }}
-        >
-          <AdvantageDisadvantage
-            rollType={rollType}
-            onRollTypeChange={setRollType}
-          />
-        </Box>
+        <AdvantageDisadvantage
+          rollType={rollType}
+          onRollTypeChange={setRollType}
+        />
 
-        {/* Modifier Input */}
-        <Box
-          bg={
-            colorMode === "light"
-              ? "rgba(255, 255, 255, 0.2)"
-              : "rgba(0, 0, 0, 0.3)"
-          }
-          p={3}
-          borderRadius="3xl"
-          backdropFilter="blur(10px)"
-          boxShadow={`0 8px 32px ${
-            colorMode === "light" ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.4)"
-          }`}
-          width="100%"
-          maxW="600px"
-          style={{
-            transform: "translateZ(0)",
-            border: `2px solid ${
-              colorMode === "light"
-                ? "rgba(255,255,255,0.3)"
-                : "rgba(255,255,255,0.1)"
-            }`,
-          }}
-        >
-          <Stack direction="column" gap={2}>
-            <Heading
-              size="md"
-              className={`text-${
-                colorMode === "light" ? "dark" : "light"
-              } text-center`}
-              style={{
-                textShadow: `0 2px 4px ${
-                  colorMode === "light" ? "rgba(0,0,0,0.2)" : "rgba(0,0,0,0.4)"
-                }`,
-              }}
-            >
-              Modifier
-            </Heading>
-            <div
-              className="input-group justify-content-center"
-              style={{ maxWidth: "250px", margin: "0 auto" }}
-            >
-              <button
-                type="button"
-                className="dice-btn btn"
-                onClick={() => setModifier((prev) => prev - 1)}
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "15px",
-                  fontSize: "1.5rem",
-                  background:
-                    colorMode === "light"
-                      ? "rgba(0, 0, 0, 0.2)"
-                      : "rgba(255, 255, 255, 0.2)",
-                  border: `3px solid ${
-                    colorMode === "light"
-                      ? "rgba(0,0,0,0.3)"
-                      : "rgba(255,255,255,0.3)"
-                  }`,
-                  color: colorMode === "light" ? "#000" : "#fff",
-                }}
-              >
-                -
-              </button>
-              <input
-                type="number"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                className={`form-control text-center text-${
-                  colorMode === "light" ? "dark" : "light"
-                }`}
-                style={{
-                  width: "80px",
-                  height: "50px",
-                  fontSize: "1.5rem",
-                  fontWeight: "bold",
-                  margin: "0 10px",
-                  background:
-                    colorMode === "light"
-                      ? "rgba(0, 0, 0, 0.1)"
-                      : "rgba(255, 255, 255, 0.1)",
-                  border: `3px solid ${
-                    colorMode === "light"
-                      ? "rgba(0,0,0,0.3)"
-                      : "rgba(255,255,255,0.3)"
-                  }`,
-                  borderRadius: "15px",
-                  boxShadow: "none",
-                }}
-                value={modifier}
-                onChange={(e) => {
-                  const val =
-                    e.target.value === "" ? 0 : parseInt(e.target.value);
-                  setModifier(isNaN(val) ? 0 : val);
-                }}
-              />
-              <button
-                type="button"
-                className="dice-btn btn"
-                onClick={() => setModifier((prev) => prev + 1)}
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "15px",
-                  fontSize: "1.5rem",
-                  background:
-                    colorMode === "light"
-                      ? "rgba(0, 0, 0, 0.2)"
-                      : "rgba(255, 255, 255, 0.2)",
-                  border: `3px solid ${
-                    colorMode === "light"
-                      ? "rgba(0,0,0,0.3)"
-                      : "rgba(255,255,255,0.3)"
-                  }`,
-                  color: colorMode === "light" ? "#000" : "#fff",
-                }}
-              >
-                +
-              </button>
-            </div>
-          </Stack>
-        </Box>
+        <ModifierInput modifier={modifier} onModifierChange={setModifier} />
 
-        {/* Roll Button and Result */}
         <Stack direction="column" gap={2} alignItems="center">
           <button
             className="roll-btn btn btn-lg px-4 py-2"
@@ -583,50 +327,11 @@ const DiceRollerNew = () => {
             Roll
           </button>
 
-          <Box
-            style={{
-              opacity: hasRolled ? 1 : 0,
-              transform: `scale(${hasRolled ? 1 : 0.5})`,
-              transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
-            }}
-          >
-            <Stack
-              direction="row"
-              gap={3}
-              alignItems="center"
-              justifyContent="center"
-            >
-              {rollResults.map((result, index) => (
-                <Heading
-                  key={index}
-                  size="2xl"
-                  className={`text-${
-                    colorMode === "light" ? "dark" : "light"
-                  } ${result.total === 20 && isNatural20 ? "natural-20" : ""}`}
-                  style={{
-                    fontSize: result.isHigher ? "4rem" : "2rem",
-                    fontWeight: "900",
-                    opacity: result.isHigher ? 1 : 0.7,
-                    textShadow:
-                      result.total === 20 && isNatural20
-                        ? "0 0 30px gold, 0 0 60px gold, 0 0 90px gold"
-                        : `0 0 30px ${
-                            colorMode === "light"
-                              ? "rgba(0,0,0,0.4)"
-                              : "rgba(255,255,255,0.4)"
-                          }`,
-                    animation: hasRolled
-                      ? result.total === 20 && isNatural20
-                        ? "natural-20 2s cubic-bezier(0.4, 0, 0.2, 1) infinite"
-                        : "glow 2s ease-in-out infinite alternate"
-                      : "none",
-                  }}
-                >
-                  {result.total}
-                </Heading>
-              ))}
-            </Stack>
-          </Box>
+          <RollResults
+            results={rollResults}
+            hasRolled={hasRolled}
+            isNatural20={isNatural20}
+          />
         </Stack>
       </Stack>
     </div>
