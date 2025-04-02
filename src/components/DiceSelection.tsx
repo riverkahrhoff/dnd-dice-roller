@@ -75,7 +75,7 @@ const DiceSelectionComponent = ({
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "1.5rem",
+                    fontSize: window.innerWidth < 640 ? "1.25rem" : "1.5rem",
                     fontWeight: "bold",
                     background: selected
                       ? colorMode === "light"

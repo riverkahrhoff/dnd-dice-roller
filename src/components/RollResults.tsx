@@ -25,7 +25,7 @@ const RollResults = ({ results, hasRolled, isNatural20 }: Props) => {
     >
       <Stack
         direction="row"
-        gap={3}
+        gap={2}
         alignItems="center"
         justifyContent="center"
       >
@@ -36,8 +36,12 @@ const RollResults = ({ results, hasRolled, isNatural20 }: Props) => {
             className={`text-${colorMode === "light" ? "dark" : "light"} ${
               result.total === 20 && isNatural20 ? "natural-20" : ""
             }`}
+            fontSize={
+              result.isHigher
+                ? { base: "3rem", sm: "4rem" }
+                : { base: "1.5rem", sm: "2rem" }
+            }
             style={{
-              fontSize: result.isHigher ? "4rem" : "2rem",
               fontWeight: "900",
               opacity: result.isHigher ? 1 : 0.7,
               textShadow:

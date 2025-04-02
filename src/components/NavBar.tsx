@@ -40,8 +40,16 @@ const NavBar = () => {
       zIndex={100}
       bg={"rgba(255, 255, 255, 0.5)"}
       color="black"
+      height={{ base: "50px", sm: "70px" }}
+      display="flex"
+      alignItems="center"
     >
-      <HStack padding="10px" justifyContent="space-between" alignItems="center">
+      <HStack
+        padding={{ base: "4px", sm: "10px" }}
+        justifyContent="space-between"
+        alignItems="center"
+        width="100%"
+      >
         {/* Left side color picker */}
         <Box>
           <input
@@ -50,8 +58,8 @@ const NavBar = () => {
             onChange={handleColorChange}
             className="form-control form-control-color"
             style={{
-              width: "40px",
-              height: "40px",
+              width: window.innerWidth < 640 ? "30px" : "40px",
+              height: window.innerWidth < 640 ? "30px" : "40px",
               padding: "2px",
               cursor: "pointer",
             }}
@@ -60,9 +68,18 @@ const NavBar = () => {
         </Box>
 
         {/* Center content */}
-        <HStack>
-          <Image src={logo} height="50px" fit="cover" />
-          <Heading fontSize="30px" fontWeight="thin">
+        <HStack gap={{ base: 1, sm: 2 }} alignItems="center">
+          <Image
+            src={logo}
+            height={{ base: "35px", sm: "50px" }}
+            fit="cover"
+            mt={{ base: "2px", sm: "0" }}
+          />
+          <Heading
+            fontSize={{ base: "16px", sm: "30px" }}
+            fontWeight="thin"
+            mt={{ base: "2px", sm: "0" }}
+          >
             The Dice Vault
           </Heading>
         </HStack>

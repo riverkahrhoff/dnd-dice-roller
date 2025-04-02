@@ -17,10 +17,13 @@ const TextColorButton: FC = () => {
         opacity: 0.8,
       }}
       borderRadius="md"
-      size="sm"
+      size={{ base: "xs", sm: "sm" }}
+      p={{ base: 1, sm: 2 }}
+      minW={{ base: "24px", sm: "32px" }}
+      h={{ base: "24px", sm: "32px" }}
       aria-label={`Toggle ${colorMode === "light" ? "Dark" : "Light"} Mode`}
     >
-      {colorMode === "light" ? <BsMoon /> : <BsSun />}
+      {colorMode === "light" ? <BsMoon size={16} /> : <BsSun size={16} />}
     </Button>
   );
 };

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Stack } from "@chakra-ui/react";
+import { Stack, Box } from "@chakra-ui/react";
 import { useColorMode } from "./ui/color-mode";
 import AdvantageDisadvantage, { RollType } from "./AdvantageDisadvantage";
 import DiceSelectionComponent from "./DiceSelection";
@@ -132,8 +132,8 @@ const DiceRollerNew = () => {
   }, [selectedDice, modifier, rollType]);
 
   return (
-    <div
-      className="p-4 min-vh-100 position-relative overflow-hidden"
+    <Box
+      className="min-vh-100 position-relative overflow-hidden"
       style={{
         backgroundColor: bgColor,
         transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -282,8 +282,10 @@ const DiceRollerNew = () => {
 
       <Stack
         direction="column"
-        pt={16}
-        gap={2}
+        pt={{ base: "70px", sm: "100px" }}
+        px={{ base: 2, sm: 4 }}
+        pb={{ base: 4, sm: 8 }}
+        gap={{ base: 2, sm: 4 }}
         alignItems="center"
         style={{ position: "relative", zIndex: 1 }}
       >
@@ -300,15 +302,15 @@ const DiceRollerNew = () => {
 
         <ModifierInput modifier={modifier} onModifierChange={setModifier} />
 
-        <Stack direction="column" gap={2} alignItems="center">
+        <Stack direction="column" gap={{ base: 2, sm: 4 }} alignItems="center">
           <button
             className="roll-btn btn btn-lg px-4 py-2"
             onClick={handleRoll}
             style={{
-              fontSize: "2rem",
               fontWeight: "bold",
               borderRadius: "25px",
-              minWidth: "180px",
+              minWidth: "160px",
+              fontSize: window.innerWidth < 640 ? "1.5rem" : "1.75rem",
               background:
                 colorMode === "light"
                   ? "rgba(0, 0, 0, 0.8)"
@@ -324,8 +326,8 @@ const DiceRollerNew = () => {
               }`,
             }}
           >
-            Roll
-          </button>
+          Roll
+        </button>
 
           <RollResults
             results={rollResults}
@@ -334,7 +336,7 @@ const DiceRollerNew = () => {
           />
         </Stack>
       </Stack>
-    </div>
+      </Box>
   );
 };
 
