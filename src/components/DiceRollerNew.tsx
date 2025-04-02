@@ -74,43 +74,42 @@ const DiceRollerNew = () => {
     let hasNatural20 = false;
     let results: RollResult[] = [];
 
-    // Handle advantage/disadvantage for d20 rolls
-    if (rollType !== "normal" && selectedDice.some((d) => d.die === 20)) {
-      const d20Selection = selectedDice.find((d) => d.die === 20);
-      const otherDice = selectedDice.filter((d) => d.die !== 20);
+    // Handle advantage/disadvantage for all dice
+    if (rollType !== "normal") {
+      let roll1Total = 0;
+      let roll2Total = 0;
 
-      // Roll other dice first
-      otherDice.forEach(({ die, quantity }) => {
+      // Roll each die twice
+      selectedDice.forEach(({ die, quantity }) => {
         for (let i = 0; i < quantity; i++) {
-          const roll = Math.floor(Math.random() * die) + 1;
-          total += roll;
+          const firstRoll = Math.floor(Math.random() * die) + 1;
+          const secondRoll = Math.floor(Math.random() * die) + 1;
+
+          roll1Total += firstRoll;
+          roll2Total += secondRoll;
+
+          // Check for natural 20
+          if (die === 20 && (firstRoll === 20 || secondRoll === 20)) {
+            hasNatural20 = true;
+          }
         }
       });
 
-      // Handle d20 with advantage/disadvantage
-      if (d20Selection) {
-        const roll1 = Math.floor(Math.random() * 20) + 1;
-        const roll2 = Math.floor(Math.random() * 20) + 1;
-        const isAdvantage = rollType === "advantage";
+      const isAdvantage = rollType === "advantage";
+      const firstIsHigher = isAdvantage
+        ? roll1Total >= roll2Total
+        : roll1Total <= roll2Total;
 
-        if (roll1 === 20 || roll2 === 20) hasNatural20 = true;
-
-        const finalRoll = isAdvantage
-          ? Math.max(roll1, roll2)
-          : Math.min(roll1, roll2);
-        total += finalRoll;
-
-        results = [
-          {
-            total: roll1,
-            isHigher: isAdvantage ? roll1 >= roll2 : roll1 <= roll2,
-          },
-          {
-            total: roll2,
-            isHigher: isAdvantage ? roll2 > roll1 : roll2 < roll1,
-          },
-        ];
-      }
+      results = [
+        {
+          total: roll1Total,
+          isHigher: firstIsHigher,
+        },
+        {
+          total: roll2Total,
+          isHigher: !firstIsHigher,
+        },
+      ];
     } else {
       // Normal roll for all dice
       selectedDice.forEach(({ die, quantity }) => {
