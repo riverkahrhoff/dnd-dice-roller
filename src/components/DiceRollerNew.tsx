@@ -3,8 +3,13 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Box, Heading, Stack } from "@chakra-ui/react";
 import { useColorMode } from "./ui/color-mode";
 
+interface DiceSelection {
+  die: number;
+  quantity: number;
+}
+
 const DiceRollerNew = () => {
-  const [diceNumber, setDiceNumber] = useState(20);
+  const [selectedDice, setSelectedDice] = useState<DiceSelection[]>([]);
   const [modifier, setModifier] = useState(0);
   const [rollTotal, setRollTotal] = useState<number | null>(null);
   const [hasRolled, setHasRolled] = useState(false);
@@ -31,13 +36,51 @@ const DiceRollerNew = () => {
 
   const dice = [4, 6, 8, 10, 12, 20];
 
+  const handleDiceClick = (die: number) => {
+    setSelectedDice((prev) => {
+      const existing = prev.find((d) => d.die === die);
+      if (existing) {
+        return prev.map((d) =>
+          d.die === die ? { ...d, quantity: d.quantity + 1 } : d
+        );
+      }
+      return [...prev, { die, quantity: 1 }];
+    });
+  };
+
+  const handleDiceRemove = (die: number) => {
+    setSelectedDice((prev) => {
+      const existing = prev.find((d) => d.die === die);
+      if (existing && existing.quantity > 1) {
+        return prev.map((d) =>
+          d.die === die ? { ...d, quantity: d.quantity - 1 } : d
+        );
+      }
+      return prev.filter((d) => d.die !== die);
+    });
+  };
+
   const handleRoll = useCallback(() => {
-    const roll = Math.floor(Math.random() * diceNumber) + 1;
-    const rollTotal = roll + modifier;
-    setRollTotal(rollTotal);
+    if (selectedDice.length === 0) return;
+
+    let total = 0;
+    let hasNatural20 = false;
+
+    selectedDice.forEach(({ die, quantity }) => {
+      for (let i = 0; i < quantity; i++) {
+        const roll = Math.floor(Math.random() * die) + 1;
+        total += roll;
+        if (roll === 20 && die === 20) {
+          hasNatural20 = true;
+        }
+      }
+    });
+
+    const finalTotal = total + modifier;
+    setRollTotal(finalTotal);
     setHasRolled(true);
-    setIsNatural20(roll === 20 && diceNumber === 20);
-  }, [diceNumber, modifier]);
+    setIsNatural20(hasNatural20);
+  }, [selectedDice, modifier]);
 
   return (
     <div
@@ -120,6 +163,42 @@ const DiceRollerNew = () => {
             color: gold !important;
             text-shadow: 0 0 20px gold, 0 0 40px gold, 0 0 60px gold !important;
           }
+          .dice-btn.selected {
+            transform: scale(1.1);
+            background: ${
+              colorMode === "light"
+                ? "rgba(0, 0, 0, 0.2)"
+                : "rgba(255, 255, 255, 0.2)"
+            } !important;
+          }
+          .dice-quantity {
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            background: ${
+              colorMode === "light"
+                ? "rgba(0, 0, 0, 0.8)"
+                : "rgba(255, 255, 255, 0.8)"
+            };
+            color: ${colorMode === "light" ? "#fff" : "#000"};
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 2;
+          }
+          .remove-btn {
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            z-index: 2;
+          }
+          .remove-btn:hover {
+            opacity: 1;
+          }
         `}
       </style>
 
@@ -189,49 +268,88 @@ const DiceRollerNew = () => {
               flexWrap="wrap"
               justifyContent="center"
             >
-              {dice.map((die, index) => (
-                <div key={index}>
-                  <input
-                    type="radio"
-                    className="btn-check"
-                    name="options-base"
-                    id={`option-${index}`}
-                    autoComplete="off"
-                    value={die}
-                    checked={diceNumber === die}
-                    onChange={(e) => setDiceNumber(Number(e.target.value))}
-                  />
-                  <label
-                    className={`dice-btn btn btn-outline-${
-                      colorMode === "light" ? "dark" : "light"
-                    } rounded-circle`}
-                    htmlFor={`option-${index}`}
-                    style={{
-                      width: "80px",
-                      height: "80px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "1.5rem",
-                      fontWeight: "bold",
-                      background:
-                        diceNumber === die
+              {dice.map((die, index) => {
+                const selected = selectedDice.find((d) => d.die === die);
+                return (
+                  <div key={index} style={{ position: "relative" }}>
+                    <button
+                      className={`dice-btn btn btn-outline-${
+                        colorMode === "light" ? "dark" : "light"
+                      } rounded-circle`}
+                      onClick={() => handleDiceClick(die)}
+                      style={{
+                        width: "80px",
+                        height: "80px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: "1.5rem",
+                        fontWeight: "bold",
+                        background: selected
                           ? colorMode === "light"
                             ? "rgba(0, 0, 0, 0.2)"
                             : "rgba(255, 255, 255, 0.2)"
                           : "transparent",
-                      border: `3px solid ${
-                        colorMode === "light"
-                          ? "rgba(0,0,0,0.3)"
-                          : "rgba(255,255,255,0.3)"
-                      }`,
-                      transform: diceNumber === die ? "scale(1.1)" : "scale(1)",
-                    }}
-                  >
-                    D{die}
-                  </label>
-                </div>
-              ))}
+                        border: `3px solid ${
+                          colorMode === "light"
+                            ? "rgba(0,0,0,0.3)"
+                            : "rgba(255,255,255,0.3)"
+                        }`,
+                        transform: selected ? "scale(1.1)" : "scale(1)",
+                      }}
+                    >
+                      <span>D{die}</span>
+                      {selected && (
+                        <span
+                          style={{
+                            fontSize: "1rem",
+                            marginTop: "-5px",
+                            opacity: 0.8,
+                          }}
+                        >
+                          ×{selected.quantity}
+                        </span>
+                      )}
+                    </button>
+                    {selected && (
+                      <button
+                        className="btn position-absolute remove-btn"
+                        style={{
+                          top: "-12px",
+                          right: "-12px",
+                          width: "28px",
+                          height: "28px",
+                          padding: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: "50%",
+                          fontSize: "1rem",
+                          background:
+                            colorMode === "light"
+                              ? "rgba(0, 0, 0, 0.6)"
+                              : "rgba(255, 255, 255, 0.6)",
+                          color: colorMode === "light" ? "#fff" : "#000",
+                          border: `2px solid ${
+                            colorMode === "light"
+                              ? "rgba(0,0,0,0.3)"
+                              : "rgba(255,255,255,0.3)"
+                          }`,
+                          backdropFilter: "blur(5px)",
+                          transition: "all 0.2s ease",
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDiceRemove(die);
+                        }}
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </Stack>
           </Stack>
         </Box>
