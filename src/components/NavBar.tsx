@@ -63,7 +63,7 @@ const NavBar = () => {
         <HStack>
           <Image src={logo} height="50px" fit="cover" />
           <Heading fontSize="30px" fontWeight="thin">
-            Dice Vault
+            The Dice Vault
           </Heading>
         </HStack>
 
