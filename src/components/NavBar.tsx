@@ -1,5 +1,6 @@
 import { Box, Heading, HStack, Image } from "@chakra-ui/react";
 import logo from "../assets/d203.png";
+import TextColorButton from "./TextColorButton";
 
 const NavBar = () => {
   return (
@@ -11,17 +12,23 @@ const NavBar = () => {
       zIndex={100}
       bg={"rgba(255, 255, 255, 0.5)"}
       color="black"
-      textAlign="center"
     >
-      {" "}
-      <HStack padding="10px" justifyContent="center" wrap="wrap">
+      <HStack padding="10px" justifyContent="space-between" alignItems="center">
+        {/* Empty box for left side to balance the layout */}
+        <Box width="40px" />
+
+        {/* Center content */}
         <HStack>
           <Image src={logo} height="50px" fit="cover" />
-
           <Heading fontSize="30px" fontWeight="thin">
             Dice Vault
           </Heading>
         </HStack>
+
+        {/* Right side button */}
+        <Box>
+          <TextColorButton />
+        </Box>
       </HStack>
     </Box>
   );
