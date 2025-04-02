@@ -28,32 +28,6 @@ const DiceRollerNew = () => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const getBackgroundStyle = () => {
-    const baseColor = bgColor || "#006400";
-    const lightOverlay = "rgba(255, 255, 255, 0.15)";
-    const darkOverlay = "rgba(0, 0, 0, 0.25)";
-
-    return {
-      backgroundColor: baseColor,
-      backgroundImage: `
-        radial-gradient(circle at 50% 50%, 
-          ${colorMode === "light" ? lightOverlay : darkOverlay}, 
-          transparent 70%
-        ),
-        radial-gradient(circle at 100% 0%, 
-          ${colorMode === "light" ? lightOverlay : darkOverlay},
-          transparent 50%
-        ),
-        radial-gradient(circle at 0% 100%, 
-          ${colorMode === "light" ? lightOverlay : darkOverlay},
-          transparent 50%
-        )
-      `,
-      backgroundSize: "100% 100%, 50% 50%, 50% 50%",
-      backgroundPosition: "center, top right, bottom left",
-    };
-  };
-
   const dice = [4, 6, 8, 10, 12, 20];
 
   const handleRoll = useCallback(() => {
@@ -61,61 +35,6 @@ const DiceRollerNew = () => {
     setRollTotal(rollTotal);
     setHasRolled(true);
   }, [diceNumber, modifier]);
-
-  const diceButtonStyle = (die: number) => ({
-    width: "70px",
-    height: "70px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "1.2rem",
-    fontWeight: "bold",
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    backdropFilter: "blur(5px)",
-    border: `2px solid ${
-      colorMode === "light" ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)"
-    }`,
-    boxShadow:
-      diceNumber === die
-        ? `0 0 20px ${
-            colorMode === "light" ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.4)"
-          }`
-        : "none",
-    transform: diceNumber === die ? "scale(1.1)" : "scale(1)",
-    background:
-      diceNumber === die
-        ? colorMode === "light"
-          ? "rgba(0, 0, 0, 0.25)"
-          : "rgba(255, 255, 255, 0.25)"
-        : colorMode === "light"
-        ? "rgba(0, 0, 0, 0.15)"
-        : "rgba(255, 255, 255, 0.15)",
-  });
-
-  const modifierButtonStyle = {
-    backgroundColor:
-      colorMode === "light"
-        ? "rgba(0, 0, 0, 0.2)"
-        : "rgba(255, 255, 255, 0.15)",
-    width: "50px",
-    height: "50px",
-    borderRadius: "15px",
-    fontSize: "1.5rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    border: `2px solid ${
-      colorMode === "light" ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.2)"
-    }`,
-    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    cursor: "pointer",
-    "&:hover": {
-      transform: "scale(1.1)",
-      boxShadow: `0 0 15px ${
-        colorMode === "light" ? "rgba(0,0,0,0.3)" : "rgba(255,255,255,0.3)"
-      }`,
-    },
-  };
 
   return (
     <div
