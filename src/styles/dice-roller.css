@@ -28,6 +28,11 @@
   100% { transform: scale(1); }
 }
 
+@keyframes diceSpin {
+  0% { transform: rotate(0deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1.1); }
+}
+
 /* Number input styling */
 .modifier-input {
   -moz-appearance: textfield;
@@ -62,7 +67,7 @@
 }
 
 .dice-btn {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease-in-out;
   position: relative;
   overflow: hidden;
 }
@@ -81,6 +86,10 @@
 
 .dice-btn:hover::before {
   opacity: 1;
+}
+
+.dice-btn.selected {
+  transform: scale(1.1);
 }
 
 .roll-btn {
@@ -120,4 +129,8 @@
 
 .remove-btn:hover {
   opacity: 1;
+}
+
+.dice-spin {
+  animation: diceSpin 0.5s ease-in-out;
 } 

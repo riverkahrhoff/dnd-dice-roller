@@ -1,5 +1,7 @@
 import { Box, Heading, Stack } from "@chakra-ui/react";
 import { useColorMode } from "./ui/color-mode";
+import DiceIcon from "./DiceIcon";
+import { useEffect, useState } from "react";
 
 interface DiceSelection {
   die: number;
@@ -10,15 +12,28 @@ interface Props {
   selectedDice: DiceSelection[];
   onDiceClick: (die: number) => void;
   onDiceRemove: (die: number) => void;
+  isRolling?: boolean;
 }
 
 const DiceSelectionComponent = ({
   selectedDice,
   onDiceClick,
   onDiceRemove,
+  isRolling = false,
 }: Props) => {
   const { colorMode } = useColorMode();
   const dice = [4, 6, 8, 10, 12, 20];
+  const [animatingDice, setAnimatingDice] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isRolling) {
+      setAnimatingDice(true);
+      const timer = setTimeout(() => {
+        setAnimatingDice(false);
+      }, 500); // Match this with the CSS animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [isRolling]);
 
   return (
     <Box
@@ -66,7 +81,9 @@ const DiceSelectionComponent = ({
                 <button
                   className={`dice-btn btn btn-outline-${
                     colorMode === "light" ? "dark" : "light"
-                  } rounded-circle`}
+                  } rounded-circle ${selected ? "selected" : ""} ${
+                    selected && animatingDice ? "dice-spin" : ""
+                  }`}
                   onClick={() => onDiceClick(die)}
                   style={{
                     width: "80px",
@@ -87,52 +104,49 @@ const DiceSelectionComponent = ({
                         ? "rgba(0,0,0,0.3)"
                         : "rgba(255,255,255,0.3)"
                     }`,
-                    transform: selected ? "scale(1.1)" : "scale(1)",
                   }}
                 >
-                  <span>D{die}</span>
+                  <DiceIcon
+                    type={`d${die}` as any}
+                    size={window.innerWidth < 640 ? 32 : 40}
+                    color={colorMode === "light" ? "#000" : "#fff"}
+                  />
                   {selected && (
                     <span
                       style={{
                         fontSize: "1rem",
-                        marginTop: "-5px",
+                        marginTop: "4px",
                         opacity: 0.8,
                       }}
                     >
-                      ×{selected.quantity}
+                      x{selected.quantity}
                     </span>
                   )}
                 </button>
                 {selected && (
                   <button
-                    className="btn position-absolute remove-btn"
+                    className="btn-close"
+                    onClick={() => onDiceRemove(die)}
                     style={{
-                      top: "-12px",
-                      right: "-12px",
-                      width: "28px",
-                      height: "28px",
-                      padding: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      position: "absolute",
+                      top: "-8px",
+                      right: "-8px",
+                      width: "24px",
+                      height: "24px",
+                      padding: "0",
                       borderRadius: "50%",
-                      fontSize: "1rem",
-                      background:
-                        colorMode === "light"
-                          ? "rgba(0, 0, 0, 0.6)"
-                          : "rgba(255, 255, 255, 0.6)",
+                      background: colorMode === "light" ? "#000" : "#fff",
                       color: colorMode === "light" ? "#fff" : "#000",
                       border: `2px solid ${
                         colorMode === "light"
                           ? "rgba(0,0,0,0.3)"
                           : "rgba(255,255,255,0.3)"
                       }`,
-                      backdropFilter: "blur(5px)",
-                      transition: "all 0.2s ease",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDiceRemove(die);
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "14px",
+                      cursor: "pointer",
                     }}
                   >
                     ×

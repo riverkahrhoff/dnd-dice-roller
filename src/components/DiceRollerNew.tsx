@@ -26,6 +26,7 @@ const DiceRollerNew = () => {
   const [isNatural20, setIsNatural20] = useState(false);
   const [rollType, setRollType] = useState<RollType>("normal");
   const [bgColor, setBgColor] = useState("#006400");
+  const [isRolling, setIsRolling] = useState(false);
   const { colorMode } = useColorMode();
 
   // Listen for background color changes in localStorage
@@ -72,6 +73,7 @@ const DiceRollerNew = () => {
   const handleRoll = useCallback(() => {
     if (selectedDice.length === 0) return;
 
+    setIsRolling(true);
     let total = 0;
     let hasNatural20 = false;
     let results: RollResult[] = [];
@@ -129,6 +131,11 @@ const DiceRollerNew = () => {
     setRollResults(results.map((r) => ({ ...r, total: r.total + modifier })));
     setHasRolled(true);
     setIsNatural20(hasNatural20);
+
+    // Reset rolling state after animation
+    setTimeout(() => {
+      setIsRolling(false);
+    }, 500);
   }, [selectedDice, modifier, rollType]);
 
   return (
@@ -293,6 +300,7 @@ const DiceRollerNew = () => {
           selectedDice={selectedDice}
           onDiceClick={handleDiceClick}
           onDiceRemove={handleDiceRemove}
+          isRolling={isRolling}
         />
 
         <AdvantageDisadvantage
@@ -326,8 +334,8 @@ const DiceRollerNew = () => {
               }`,
             }}
           >
-          Roll
-        </button>
+            Roll
+          </button>
 
           <RollResults
             results={rollResults}
@@ -336,7 +344,7 @@ const DiceRollerNew = () => {
           />
         </Stack>
       </Stack>
-      </Box>
+    </Box>
   );
 };
 
