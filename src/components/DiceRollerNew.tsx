@@ -8,6 +8,7 @@ const DiceRollerNew = () => {
   const [modifier, setModifier] = useState(0);
   const [rollTotal, setRollTotal] = useState<number | null>(null);
   const [hasRolled, setHasRolled] = useState(false);
+  const [isNatural20, setIsNatural20] = useState(false);
   const [bgColor, setBgColor] = useState("#006400");
   const { colorMode } = useColorMode();
 
@@ -31,9 +32,11 @@ const DiceRollerNew = () => {
   const dice = [4, 6, 8, 10, 12, 20];
 
   const handleRoll = useCallback(() => {
-    const rollTotal = Math.floor(Math.random() * diceNumber) + 1 + modifier;
+    const roll = Math.floor(Math.random() * diceNumber) + 1;
+    const rollTotal = roll + modifier;
     setRollTotal(rollTotal);
     setHasRolled(true);
+    setIsNatural20(roll === 20 && diceNumber === 20);
   }, [diceNumber, modifier]);
 
   return (
@@ -44,7 +47,7 @@ const DiceRollerNew = () => {
         transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
-      {/* Floating particles */}
+      {/* Floating particles and animations */}
       <style>
         {`
           @keyframes float {
@@ -63,12 +66,29 @@ const DiceRollerNew = () => {
             25% { transform: translateX(-5px) rotate(-5deg); }
             75% { transform: translateX(5px) rotate(5deg); }
           }
+          @keyframes confetti-fall {
+            0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+          }
+          @keyframes natural-20 {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+          }
           .particle {
             position: absolute;
             pointer-events: none;
             animation: float 8s infinite linear;
             opacity: 0.1;
             z-index: 0;
+          }
+          .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: gold;
+            animation: confetti-fall 3s linear forwards;
+            z-index: 2;
           }
           .dice-btn {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -95,28 +115,28 @@ const DiceRollerNew = () => {
           .roll-btn:active {
             animation: shake 0.5s ease-in-out;
           }
+          .natural-20 {
+            animation: natural-20 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+            color: gold !important;
+            text-shadow: 0 0 20px gold, 0 0 40px gold, 0 0 60px gold !important;
+          }
         `}
       </style>
-      {/* Generate particles */}
-      {Array.from({ length: 20 }).map((_, i) => (
-        <div
-          key={i}
-          className="particle"
-          style={{
-            width: Math.random() * 40 + 20 + "px",
-            height: Math.random() * 40 + 20 + "px",
-            left: Math.random() * 100 + "%",
-            top: Math.random() * 100 + "%",
-            background:
-              colorMode === "light"
-                ? "rgba(0,0,0,0.1)"
-                : "rgba(255,255,255,0.1)",
-            borderRadius: Math.random() > 0.5 ? "50%" : "20%",
-            animationDelay: `${Math.random() * 8}s`,
-            animationDuration: `${8 + Math.random() * 4}s`,
-          }}
-        />
-      ))}
+
+      {/* Generate confetti for natural 20 */}
+      {isNatural20 &&
+        Array.from({ length: 50 }).map((_, i) => (
+          <div
+            key={`confetti-${i}`}
+            className="confetti"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 2}s`,
+              background: `hsl(${Math.random() * 360}, 100%, 50%)`,
+              transform: `rotate(${Math.random() * 360}deg)`,
+            }}
+          />
+        ))}
 
       <Stack
         direction="column"
@@ -377,17 +397,23 @@ const DiceRollerNew = () => {
           >
             <Heading
               size="2xl"
-              className={`text-${colorMode === "light" ? "dark" : "light"}`}
+              className={`text-${colorMode === "light" ? "dark" : "light"} ${
+                isNatural20 ? "natural-20" : ""
+              }`}
               style={{
                 fontSize: "5rem",
                 fontWeight: "900",
-                textShadow: `0 0 30px ${
-                  colorMode === "light"
-                    ? "rgba(0,0,0,0.4)"
-                    : "rgba(255,255,255,0.4)"
-                }`,
+                textShadow: isNatural20
+                  ? "0 0 30px gold, 0 0 60px gold, 0 0 90px gold"
+                  : `0 0 30px ${
+                      colorMode === "light"
+                        ? "rgba(0,0,0,0.4)"
+                        : "rgba(255,255,255,0.4)"
+                    }`,
                 animation: hasRolled
-                  ? "glow 2s ease-in-out infinite alternate"
+                  ? isNatural20
+                    ? "natural-20 2s cubic-bezier(0.4, 0, 0.2, 1) infinite"
+                    : "glow 2s ease-in-out infinite alternate"
                   : "none",
               }}
             >
