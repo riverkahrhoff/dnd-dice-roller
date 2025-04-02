@@ -103,24 +103,45 @@ const DiceRollerNew = () => {
               Modifier
             </Heading>
             <div className="input-group">
-              <span
-                className={`input-group-text text-${
+              <button
+                type="button"
+                className={`btn btn-outline-${
                   colorMode === "light" ? "dark" : "light"
-                } border-${colorMode === "light" ? "dark" : "light"}`}
+                }`}
+                onClick={() => setModifier((prev) => prev - 1)}
                 style={{ backgroundColor: "transparent" }}
               >
-                +/-
-              </span>
+                -
+              </button>
               <input
                 type="number"
-                className={`form-control text-${
+                inputMode="numeric"
+                pattern="[0-9]*"
+                className={`form-control text-center text-${
                   colorMode === "light" ? "dark" : "light"
                 } border-${colorMode === "light" ? "dark" : "light"}`}
-                style={{ backgroundColor: "transparent" }}
-                placeholder="Enter modifier"
+                style={{
+                  backgroundColor: "transparent",
+                  minWidth: "60px",
+                  maxWidth: "100px",
+                }}
                 value={modifier}
-                onChange={(e) => setModifier(Number(e.target.value))}
+                onChange={(e) => {
+                  const val =
+                    e.target.value === "" ? 0 : parseInt(e.target.value);
+                  setModifier(isNaN(val) ? 0 : val);
+                }}
               />
+              <button
+                type="button"
+                className={`btn btn-outline-${
+                  colorMode === "light" ? "dark" : "light"
+                }`}
+                onClick={() => setModifier((prev) => prev + 1)}
+                style={{ backgroundColor: "transparent" }}
+              >
+                +
+              </button>
             </div>
           </Stack>
         </Box>
