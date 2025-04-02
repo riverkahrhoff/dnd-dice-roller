@@ -2,18 +2,25 @@ import { useState, useCallback, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Box, Heading, Stack } from "@chakra-ui/react";
 import { useColorMode } from "./ui/color-mode";
+import AdvantageDisadvantage, { RollType } from "./AdvantageDisadvantage";
 
 interface DiceSelection {
   die: number;
   quantity: number;
 }
 
+interface RollResult {
+  total: number;
+  isHigher: boolean;
+}
+
 const DiceRollerNew = () => {
   const [selectedDice, setSelectedDice] = useState<DiceSelection[]>([]);
   const [modifier, setModifier] = useState(0);
-  const [rollTotal, setRollTotal] = useState<number | null>(null);
+  const [rollResults, setRollResults] = useState<RollResult[]>([]);
   const [hasRolled, setHasRolled] = useState(false);
   const [isNatural20, setIsNatural20] = useState(false);
+  const [rollType, setRollType] = useState<RollType>("normal");
   const [bgColor, setBgColor] = useState("#006400");
   const { colorMode } = useColorMode();
 
@@ -65,22 +72,63 @@ const DiceRollerNew = () => {
 
     let total = 0;
     let hasNatural20 = false;
+    let results: RollResult[] = [];
 
-    selectedDice.forEach(({ die, quantity }) => {
-      for (let i = 0; i < quantity; i++) {
-        const roll = Math.floor(Math.random() * die) + 1;
-        total += roll;
-        if (roll === 20 && die === 20) {
-          hasNatural20 = true;
+    // Handle advantage/disadvantage for d20 rolls
+    if (rollType !== "normal" && selectedDice.some((d) => d.die === 20)) {
+      const d20Selection = selectedDice.find((d) => d.die === 20);
+      const otherDice = selectedDice.filter((d) => d.die !== 20);
+
+      // Roll other dice first
+      otherDice.forEach(({ die, quantity }) => {
+        for (let i = 0; i < quantity; i++) {
+          const roll = Math.floor(Math.random() * die) + 1;
+          total += roll;
         }
-      }
-    });
+      });
 
-    const finalTotal = total + modifier;
-    setRollTotal(finalTotal);
+      // Handle d20 with advantage/disadvantage
+      if (d20Selection) {
+        const roll1 = Math.floor(Math.random() * 20) + 1;
+        const roll2 = Math.floor(Math.random() * 20) + 1;
+        const isAdvantage = rollType === "advantage";
+
+        if (roll1 === 20 || roll2 === 20) hasNatural20 = true;
+
+        const finalRoll = isAdvantage
+          ? Math.max(roll1, roll2)
+          : Math.min(roll1, roll2);
+        total += finalRoll;
+
+        results = [
+          {
+            total: roll1,
+            isHigher: isAdvantage ? roll1 >= roll2 : roll1 <= roll2,
+          },
+          {
+            total: roll2,
+            isHigher: isAdvantage ? roll2 > roll1 : roll2 < roll1,
+          },
+        ];
+      }
+    } else {
+      // Normal roll for all dice
+      selectedDice.forEach(({ die, quantity }) => {
+        for (let i = 0; i < quantity; i++) {
+          const roll = Math.floor(Math.random() * die) + 1;
+          total += roll;
+          if (roll === 20 && die === 20) {
+            hasNatural20 = true;
+          }
+        }
+      });
+      results = [{ total, isHigher: true }];
+    }
+
+    setRollResults(results.map((r) => ({ ...r, total: r.total + modifier })));
     setHasRolled(true);
     setIsNatural20(hasNatural20);
-  }, [selectedDice, modifier]);
+  }, [selectedDice, modifier, rollType]);
 
   return (
     <div
@@ -220,7 +268,7 @@ const DiceRollerNew = () => {
       <Stack
         direction="column"
         pt={16}
-        gap={4}
+        gap={2}
         alignItems="center"
         style={{ position: "relative", zIndex: 1 }}
       >
@@ -231,7 +279,7 @@ const DiceRollerNew = () => {
               ? "rgba(255, 255, 255, 0.2)"
               : "rgba(0, 0, 0, 0.3)"
           }
-          p={6}
+          p={3}
           borderRadius="3xl"
           backdropFilter="blur(10px)"
           boxShadow={`0 8px 32px ${
@@ -248,9 +296,9 @@ const DiceRollerNew = () => {
             }`,
           }}
         >
-          <Stack direction="column" gap={4}>
+          <Stack direction="column" gap={2}>
             <Heading
-              size="lg"
+              size="md"
               className={`text-${
                 colorMode === "light" ? "dark" : "light"
               } text-center`}
@@ -264,7 +312,7 @@ const DiceRollerNew = () => {
             </Heading>
             <Stack
               direction="row"
-              gap={3}
+              gap={2}
               flexWrap="wrap"
               justifyContent="center"
             >
@@ -354,14 +402,14 @@ const DiceRollerNew = () => {
           </Stack>
         </Box>
 
-        {/* Modifier Input */}
+        {/* Advantage/Disadvantage Component */}
         <Box
           bg={
             colorMode === "light"
               ? "rgba(255, 255, 255, 0.2)"
               : "rgba(0, 0, 0, 0.3)"
           }
-          p={6}
+          p={3}
           borderRadius="3xl"
           backdropFilter="blur(10px)"
           boxShadow={`0 8px 32px ${
@@ -378,9 +426,39 @@ const DiceRollerNew = () => {
             }`,
           }}
         >
-          <Stack direction="column" gap={4}>
+          <AdvantageDisadvantage
+            rollType={rollType}
+            onRollTypeChange={setRollType}
+          />
+        </Box>
+
+        {/* Modifier Input */}
+        <Box
+          bg={
+            colorMode === "light"
+              ? "rgba(255, 255, 255, 0.2)"
+              : "rgba(0, 0, 0, 0.3)"
+          }
+          p={3}
+          borderRadius="3xl"
+          backdropFilter="blur(10px)"
+          boxShadow={`0 8px 32px ${
+            colorMode === "light" ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.4)"
+          }`}
+          width="100%"
+          maxW="600px"
+          style={{
+            transform: "translateZ(0)",
+            border: `2px solid ${
+              colorMode === "light"
+                ? "rgba(255,255,255,0.3)"
+                : "rgba(255,255,255,0.1)"
+            }`,
+          }}
+        >
+          <Stack direction="column" gap={2}>
             <Heading
-              size="lg"
+              size="md"
               className={`text-${
                 colorMode === "light" ? "dark" : "light"
               } text-center`}
@@ -401,10 +479,10 @@ const DiceRollerNew = () => {
                 className="dice-btn btn"
                 onClick={() => setModifier((prev) => prev - 1)}
                 style={{
-                  width: "60px",
-                  height: "60px",
-                  borderRadius: "20px",
-                  fontSize: "2rem",
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "15px",
+                  fontSize: "1.5rem",
                   background:
                     colorMode === "light"
                       ? "rgba(0, 0, 0, 0.2)"
@@ -427,9 +505,9 @@ const DiceRollerNew = () => {
                   colorMode === "light" ? "dark" : "light"
                 }`}
                 style={{
-                  width: "100px",
-                  height: "60px",
-                  fontSize: "2rem",
+                  width: "80px",
+                  height: "50px",
+                  fontSize: "1.5rem",
                   fontWeight: "bold",
                   margin: "0 10px",
                   background:
@@ -441,7 +519,7 @@ const DiceRollerNew = () => {
                       ? "rgba(0,0,0,0.3)"
                       : "rgba(255,255,255,0.3)"
                   }`,
-                  borderRadius: "20px",
+                  borderRadius: "15px",
                   boxShadow: "none",
                 }}
                 value={modifier}
@@ -456,10 +534,10 @@ const DiceRollerNew = () => {
                 className="dice-btn btn"
                 onClick={() => setModifier((prev) => prev + 1)}
                 style={{
-                  width: "60px",
-                  height: "60px",
-                  borderRadius: "20px",
-                  fontSize: "2rem",
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "15px",
+                  fontSize: "1.5rem",
                   background:
                     colorMode === "light"
                       ? "rgba(0, 0, 0, 0.2)"
@@ -479,15 +557,15 @@ const DiceRollerNew = () => {
         </Box>
 
         {/* Roll Button and Result */}
-        <Stack direction="column" gap={4} alignItems="center">
+        <Stack direction="column" gap={2} alignItems="center">
           <button
-            className="roll-btn btn btn-lg px-5 py-3"
+            className="roll-btn btn btn-lg px-4 py-2"
             onClick={handleRoll}
             style={{
-              fontSize: "2.5rem",
+              fontSize: "2rem",
               fontWeight: "bold",
-              borderRadius: "30px",
-              minWidth: "200px",
+              borderRadius: "25px",
+              minWidth: "180px",
               background:
                 colorMode === "light"
                   ? "rgba(0, 0, 0, 0.8)"
@@ -513,30 +591,42 @@ const DiceRollerNew = () => {
               transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
             }}
           >
-            <Heading
-              size="2xl"
-              className={`text-${colorMode === "light" ? "dark" : "light"} ${
-                isNatural20 ? "natural-20" : ""
-              }`}
-              style={{
-                fontSize: "5rem",
-                fontWeight: "900",
-                textShadow: isNatural20
-                  ? "0 0 30px gold, 0 0 60px gold, 0 0 90px gold"
-                  : `0 0 30px ${
-                      colorMode === "light"
-                        ? "rgba(0,0,0,0.4)"
-                        : "rgba(255,255,255,0.4)"
-                    }`,
-                animation: hasRolled
-                  ? isNatural20
-                    ? "natural-20 2s cubic-bezier(0.4, 0, 0.2, 1) infinite"
-                    : "glow 2s ease-in-out infinite alternate"
-                  : "none",
-              }}
+            <Stack
+              direction="row"
+              gap={3}
+              alignItems="center"
+              justifyContent="center"
             >
-              {rollTotal !== null ? rollTotal : "-"}
-            </Heading>
+              {rollResults.map((result, index) => (
+                <Heading
+                  key={index}
+                  size="2xl"
+                  className={`text-${
+                    colorMode === "light" ? "dark" : "light"
+                  } ${result.total === 20 && isNatural20 ? "natural-20" : ""}`}
+                  style={{
+                    fontSize: result.isHigher ? "4rem" : "2rem",
+                    fontWeight: "900",
+                    opacity: result.isHigher ? 1 : 0.7,
+                    textShadow:
+                      result.total === 20 && isNatural20
+                        ? "0 0 30px gold, 0 0 60px gold, 0 0 90px gold"
+                        : `0 0 30px ${
+                            colorMode === "light"
+                              ? "rgba(0,0,0,0.4)"
+                              : "rgba(255,255,255,0.4)"
+                          }`,
+                    animation: hasRolled
+                      ? result.total === 20 && isNatural20
+                        ? "natural-20 2s cubic-bezier(0.4, 0, 0.2, 1) infinite"
+                        : "glow 2s ease-in-out infinite alternate"
+                      : "none",
+                  }}
+                >
+                  {result.total}
+                </Heading>
+              ))}
+            </Stack>
           </Box>
         </Stack>
       </Stack>
