@@ -123,7 +123,9 @@ const DiceSelectionComponent = ({
                       style={{
                         fontSize: "1rem",
                         marginTop: "4px",
-                        opacity: 0.8,
+                        opacity: 1,
+                        fontWeight: "bold",
+                        color: colorMode === "light" ? "#000" : "#fff",
                       }}
                     >
                       x{selected.quantity}

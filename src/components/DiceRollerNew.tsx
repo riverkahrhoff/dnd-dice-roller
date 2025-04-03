@@ -246,7 +246,7 @@ const DiceRollerNew = () => {
             background: ${
               colorMode === "light"
                 ? "rgba(0, 0, 0, 0.8)"
-                : "rgba(255, 255, 255, 0.8)"
+                : "rgba(255, 255, 255, 0.95)"
             };
             color: ${colorMode === "light" ? "#fff" : "#000"};
             border-radius: 50%;
@@ -258,6 +258,16 @@ const DiceRollerNew = () => {
             font-size: 0.8rem;
             font-weight: bold;
             z-index: 2;
+            border: 2px solid ${
+              colorMode === "light"
+                ? "rgba(255, 255, 255, 0.3)"
+                : "rgba(0, 0, 0, 0.3)"
+            };
+            box-shadow: 0 2px 4px ${
+              colorMode === "light"
+                ? "rgba(0, 0, 0, 0.2)"
+                : "rgba(0, 0, 0, 0.4)"
+            };
           }
           .remove-btn {
             opacity: 0.7;
@@ -320,16 +330,23 @@ const DiceRollerNew = () => {
               background:
                 colorMode === "light"
                   ? "rgba(0, 0, 0, 0.8)"
-                  : "rgba(255, 255, 255, 0.8)",
+                  : "rgba(255, 255, 255, 0.95)",
               border: `3px solid ${
                 colorMode === "light"
-                  ? "rgba(0,0,0,0.3)"
-                  : "rgba(255,255,255,0.3)"
+                  ? "rgba(255, 255, 255, 0.3)"
+                  : "rgba(0, 0, 0, 0.3)"
               }`,
               color: colorMode === "light" ? "#fff" : "#000",
               boxShadow: `0 8px 32px ${
-                colorMode === "light" ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.4)"
+                colorMode === "light"
+                  ? "rgba(0, 0, 0, 0.3)"
+                  : "rgba(0, 0, 0, 0.5)"
+              }, 0 0 0 1px ${
+                colorMode === "light"
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.2)"
               }`,
+              backdropFilter: "blur(4px)",
             }}
           >
             Roll
