@@ -27,11 +27,15 @@ const DiceSelectionComponent = ({
 
   useEffect(() => {
     if (isRolling) {
+      // Start animation
       setAnimatingDice(true);
       const timer = setTimeout(() => {
         setAnimatingDice(false);
-      }, 500); // Match this with the CSS animation duration
+      }, 500);
       return () => clearTimeout(timer);
+    } else {
+      // Reset animation state when not rolling
+      setAnimatingDice(false);
     }
   }, [isRolling]);
 
@@ -76,14 +80,14 @@ const DiceSelectionComponent = ({
         <Stack direction="row" gap={2} flexWrap="wrap" justifyContent="center">
           {dice.map((die, index) => {
             const selected = selectedDice.find((d) => d.die === die);
+            const shouldAnimate = selected && animatingDice;
+
             return (
               <div key={index} style={{ position: "relative" }}>
                 <button
                   className={`dice-btn btn btn-outline-${
                     colorMode === "light" ? "dark" : "light"
-                  } rounded-circle ${selected ? "selected" : ""} ${
-                    selected && animatingDice ? "dice-spin" : ""
-                  }`}
+                  } rounded-circle ${selected ? "selected" : ""}`}
                   onClick={() => onDiceClick(die)}
                   style={{
                     width: "80px",
@@ -104,6 +108,9 @@ const DiceSelectionComponent = ({
                         ? "rgba(0,0,0,0.3)"
                         : "rgba(255,255,255,0.3)"
                     }`,
+                    animation: shouldAnimate
+                      ? "diceSpin 0.5s ease-in-out"
+                      : "none",
                   }}
                 >
                   <DiceIcon

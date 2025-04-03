@@ -49,6 +49,8 @@ const NavBar = () => {
         justifyContent="space-between"
         alignItems="center"
         width="100%"
+        px={{ base: "1rem", sm: "calc((100% - 600px) / 2)" }}
+        maxW="100%"
       >
         {/* Left side color picker */}
         <Box>
@@ -58,8 +60,8 @@ const NavBar = () => {
             onChange={handleColorChange}
             className="form-control form-control-color"
             style={{
-              width: window.innerWidth < 640 ? "30px" : "40px",
-              height: window.innerWidth < 640 ? "30px" : "40px",
+              width: "30px",
+              height: "30px",
               padding: "2px",
               cursor: "pointer",
             }}

@@ -22,7 +22,6 @@ const DiceRollerNew = () => {
   const [selectedDice, setSelectedDice] = useState<DiceSelection[]>([]);
   const [modifier, setModifier] = useState(0);
   const [rollResults, setRollResults] = useState<RollResult[]>([]);
-  const [hasRolled, setHasRolled] = useState(false);
   const [isNatural20, setIsNatural20] = useState(false);
   const [rollType, setRollType] = useState<RollType>("normal");
   const [bgColor, setBgColor] = useState("#006400");
@@ -129,7 +128,6 @@ const DiceRollerNew = () => {
     }
 
     setRollResults(results.map((r) => ({ ...r, total: r.total + modifier })));
-    setHasRolled(true);
     setIsNatural20(hasNatural20);
 
     // Reset rolling state after animation
@@ -337,11 +335,7 @@ const DiceRollerNew = () => {
             Roll
           </button>
 
-          <RollResults
-            results={rollResults}
-            hasRolled={hasRolled}
-            isNatural20={isNatural20}
-          />
+          <RollResults results={rollResults} isNatural20={isNatural20} />
         </Stack>
       </Stack>
     </Box>
