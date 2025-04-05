@@ -349,7 +349,7 @@ const DiceRollerNew = () => {
               backdropFilter: "blur(4px)",
             }}
           >
-            Roll
+            {selectedDice.length ? "Roll" : "Choose Dice"}
           </button>
 
           <RollResults results={rollResults} isNatural20={isNatural20} />

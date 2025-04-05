@@ -43,7 +43,7 @@ const AdvantageDisadvantage = ({ rollType, onRollTypeChange }: Props) => {
         width="100%"
       >
         <Button
-          onClick={() => onRollTypeChange("advantage")}
+          onClick={() => onRollTypeChange("disadvantage")}
           minW={{ base: "80px", sm: "120px" }}
           h={{ base: "35px", sm: "40px" }}
           fontSize={{ base: "0.75rem", sm: "1rem" }}
@@ -52,7 +52,7 @@ const AdvantageDisadvantage = ({ rollType, onRollTypeChange }: Props) => {
             borderRadius: "20px",
             fontWeight: "bold",
             background:
-              rollType === "advantage"
+              rollType === "disadvantage"
                 ? colorMode === "light"
                   ? "rgba(0, 0, 0, 0.8)"
                   : "rgba(255, 255, 255, 0.8)"
@@ -60,7 +60,7 @@ const AdvantageDisadvantage = ({ rollType, onRollTypeChange }: Props) => {
                 ? "rgba(0, 0, 0, 0.2)"
                 : "rgba(255, 255, 255, 0.2)",
             color:
-              rollType === "advantage"
+              rollType === "disadvantage"
                 ? colorMode === "light"
                   ? "#fff"
                   : "#000"
@@ -72,11 +72,11 @@ const AdvantageDisadvantage = ({ rollType, onRollTypeChange }: Props) => {
                 ? "rgba(0,0,0,0.3)"
                 : "rgba(255,255,255,0.3)"
             }`,
-            transform: rollType === "advantage" ? "scale(1.05)" : "scale(1)",
+            transform: rollType === "disadvantage" ? "scale(1.05)" : "scale(1)",
             transition: "all 0.2s ease",
           }}
         >
-          Advantage
+          Disadvantage
         </Button>
 
         <Button
@@ -117,7 +117,7 @@ const AdvantageDisadvantage = ({ rollType, onRollTypeChange }: Props) => {
         </Button>
 
         <Button
-          onClick={() => onRollTypeChange("disadvantage")}
+          onClick={() => onRollTypeChange("advantage")}
           minW={{ base: "80px", sm: "120px" }}
           h={{ base: "35px", sm: "40px" }}
           fontSize={{ base: "0.75rem", sm: "1rem" }}
@@ -126,7 +126,7 @@ const AdvantageDisadvantage = ({ rollType, onRollTypeChange }: Props) => {
             borderRadius: "20px",
             fontWeight: "bold",
             background:
-              rollType === "disadvantage"
+              rollType === "advantage"
                 ? colorMode === "light"
                   ? "rgba(0, 0, 0, 0.8)"
                   : "rgba(255, 255, 255, 0.8)"
@@ -134,7 +134,7 @@ const AdvantageDisadvantage = ({ rollType, onRollTypeChange }: Props) => {
                 ? "rgba(0, 0, 0, 0.2)"
                 : "rgba(255, 255, 255, 0.2)",
             color:
-              rollType === "disadvantage"
+              rollType === "advantage"
                 ? colorMode === "light"
                   ? "#fff"
                   : "#000"
@@ -146,11 +146,11 @@ const AdvantageDisadvantage = ({ rollType, onRollTypeChange }: Props) => {
                 ? "rgba(0,0,0,0.3)"
                 : "rgba(255,255,255,0.3)"
             }`,
-            transform: rollType === "disadvantage" ? "scale(1.05)" : "scale(1)",
+            transform: rollType === "advantage" ? "scale(1.05)" : "scale(1)",
             transition: "all 0.2s ease",
           }}
         >
-          Disadvantage
+          Advantage
         </Button>
       </Stack>
     </Box>
